@@ -9,8 +9,8 @@ EXPOSE 80
 EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-nanoserver-1903 AS build
-WORKDIR /src
-COPY ["HangFire.Scheduler/HangFire.Scheduler.csproj", "HangFire.Scheduler/"]
+WORKDIR /src/HangFire.Scheduler
+COPY ["HangFire.Scheduler.csproj", "HangFire.Scheduler/"]
 RUN dotnet restore "HangFire.Scheduler/HangFire.Scheduler.csproj"
 COPY . .
 WORKDIR "/src/HangFire.Scheduler"

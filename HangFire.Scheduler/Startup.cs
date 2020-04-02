@@ -1,17 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.PostgreSql;
+using HangFire.Scheduler.Filter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using System;
 
 namespace HangFire.Scheduler
 {
@@ -29,6 +24,11 @@ namespace HangFire.Scheduler
         {
             services.AddControllers();
 
+            ConfigureHangfire(services);
+        }
+
+        private void ConfigureHangfire(IServiceCollection services)
+        {
             services.AddHangfire(configuration => configuration
                                                     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                                                     .UseSimpleAssemblyNameTypeSerializer()
@@ -41,7 +41,7 @@ namespace HangFire.Scheduler
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IBackgroundJobClient backgroundJobs, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -59,7 +59,11 @@ namespace HangFire.Scheduler
                 endpoints.MapControllers();
             });
 
-            app.UseHangfireDashboard();
+            // Add hangfire dashboard
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new DashboardAuthorizationFilter() },
+            });
         }
     }
 }
